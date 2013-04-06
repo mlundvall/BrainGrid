@@ -29,9 +29,9 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <time.h>
-#include "bgtypes.h"	//defines FLOAT, needed for WIN32 compiling
 #endif
 
+#include "bgtypes.h"	//defines FLOAT, needed for WIN32 compiling
 #include "RNG.h"
 
 #include "SourceVersions.h"

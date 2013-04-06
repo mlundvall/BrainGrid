@@ -43,7 +43,7 @@ MATRIXOBJS = $(MATRIXDIR)/Matrix.o $(MATRIXDIR)/VectorMatrix.o \
 
 XMLOBJS = $(XMLDIR)/tinyxml.o $(XMLDIR)/tinyxmlparser.o $(XMLDIR)/tinyxmlerror.o $(XMLDIR)/tinystr.o
 
-OTHEROBJS = $(SVDIR)/SourceVersions.o $(RNGDIR)/norm.o $(PCDIR)/ParamContainer.o $(UTILDIR)/Timer.o
+OTHEROBJS = $(SVDIR)/SourceVersions.o $(RNGDIR)/norm.o $(RNGDIR)/RNG.o $(PCDIR)/ParamContainer.o $(UTILDIR)/Timer.o
 
 GPUOBJS = GpuSim.o \
        HostSim.o \
@@ -152,3 +152,6 @@ SingleThreadedSim.o: SingleThreadedSim.cpp SingleThreadedSim.h
 Utils/Timer.o: Utils/Timer.cpp Utils/Timer.h
 
 RNG/norm.o: $(RNGDIR)/norm.cpp $(RNGDIR)/norm.h $(RNGDIR)/MersenneTwister.cpp $(RNGDIR)/MersenneTwister.h
+
+RNG/RNG.o: $(RNGDIR)/RNG.cpp $(RNGDIR)/norm.h $(RNGDIR)/RNG.h
+

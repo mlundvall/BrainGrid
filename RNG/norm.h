@@ -22,8 +22,8 @@
 #define _NORM_H_
 
 #include "RNG.h"
-//PAB #include "RNG/MersenneTwister.h"
-#include "RNG.h" //pab
+#include "MersenneTwister.h"
+//#include "RNG.h" //pab
 
 /*!
   @class Norm

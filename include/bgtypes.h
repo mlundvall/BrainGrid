@@ -23,7 +23,7 @@
 #ifdef _WIN32
 // We're stuck with single precision, as defined in windows.h/windef.h
 #define SINGLEPRECISION
-//#define FLOAT float
+#define FLOAT float
 #include <Windows.h>
 typedef unsigned long long int uint64_t;	//included in inttypes.h, which is not available in WIN32//included in inttypes.h, which is not available in WIN32
 typedef unsigned int       uint32_t; // same deal as above

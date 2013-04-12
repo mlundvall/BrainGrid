@@ -352,14 +352,17 @@ void Network::initNeurons(FLOAT Iinject[2], FLOAT Inoise[2], FLOAT Vthresh[2], F
     for (int i = 0; i < m_cNeurons; i++)
     {
         // set common parameters
-        m_neuronList[i].setParams(
-            rng.inRange(Iinject[0], Iinject[1]), 
-            rng.inRange(Inoise[0], Inoise[1]),
-            rng.inRange(Vthresh[0], Vthresh[1]),
-            rng.inRange(Vresting[0], Vresting[1]),
-            rng.inRange(Vreset[0],Vreset[1]),
-            rng.inRange(Vinit[0], Vinit[1]), 
-            m_deltaT);
+        // Note that it is important to make the RNG calls happen in a
+        // deterministic order. THIS CANNOT BE ASSURED IF THE CALLS
+        // ARE WRITTEN AS PART OF THE ARGUMENTS IN A FUNCTION CALL!!
+        // Thank you, C++ standards committee.
+        FLOAT Ii = rng.inRange(Iinject[0], Iinject[1]);
+        FLOAT In = rng.inRange(Inoise[0], Inoise[1]);
+        FLOAT Vth = rng.inRange(Vthresh[0], Vthresh[1]);
+        FLOAT Vrest = rng.inRange(Vresting[0], Vresting[1]);
+        FLOAT Vreset = rng.inRange(Vreset[0],Vreset[1]);
+        FLOAT Vinit = rng.inRange(Vinit[0], Vinit[1]);
+        m_neuronList[i].setParams(Ii, In, Vth, Vrest, Vreset, Vinit, m_deltaT);
 
         switch (m_rgNeuronTypeMap[i])
         {

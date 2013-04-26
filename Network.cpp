@@ -360,9 +360,9 @@ void Network::initNeurons(FLOAT Iinject[2], FLOAT Inoise[2], FLOAT Vthresh[2], F
         FLOAT In = rng.inRange(Inoise[0], Inoise[1]);
         FLOAT Vth = rng.inRange(Vthresh[0], Vthresh[1]);
         FLOAT Vrest = rng.inRange(Vresting[0], Vresting[1]);
-        FLOAT Vreset = rng.inRange(Vreset[0],Vreset[1]);
-        FLOAT Vinit = rng.inRange(Vinit[0], Vinit[1]);
-        m_neuronList[i].setParams(Ii, In, Vth, Vrest, Vreset, Vinit, m_deltaT);
+        FLOAT Vres = rng.inRange(Vreset[0],Vreset[1]);
+        FLOAT Vin = rng.inRange(Vinit[0], Vinit[1]);
+        m_neuronList[i].setParams(Ii, In, Vth, Vrest, Vres, Vin, m_deltaT);
 
         switch (m_rgNeuronTypeMap[i])
         {

@@ -9,7 +9,7 @@
 %                                   by Jewel Y. Lee (last updated: 2/27/18)
 function size = getH5datasetSize(h5file, dataset)
 %h5file = 'tR_1.0--fE_0.90_10000';
-dataset = 'spikesProbedNeurons';
+%dataset = 'spikesProbedNeurons';
 
 outfile = [dataset '.txt'];
 if exist(outfile, 'file')==2

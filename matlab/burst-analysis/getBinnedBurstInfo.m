@@ -9,20 +9,21 @@
 %   h5file  - BrainGrid simulation result (.h5)
 %
 %   Output: 
-%   <allBinnedBurstInfo.csv> - burst metadata
+%   <binnedBurstInfo.csv> - burst metadata
 
-%Author: Jewel Y. Lee (jewel87@uw.edu) 3/24/2018 last updated.
+%Author: Jewel Y. Lee (jewel87@uw.edu) 3/25/2018 last updated.
 function getBinnedBurstInfo(h5file)
 % ------------------------------------------------------------------------
 % Read from input data and open output file
 % - spikesHistory = spike count in each 10ms bins
+% - neuronTypes = neuron types for every neuron
 % ------------------------------------------------------------------------
 % h5file = 'tR_1.0--fE_0.90_10000';
 SH = double(hdf5read([h5file '.h5'], 'spikesHistory')); 
 N = uint8(hdf5read([h5file '.h5'], 'neuronTypes')); 
 n_neurons = length(N);                          % number of neurons  
 SH10ms = SH/n_neurons;                          % spikes/neuron in 10 ms
-fid = fopen('allBinnedBurstInfo.csv', 'w') ;         
+fid = fopen('binnedBurstInfo.csv', 'w') ;         
 fprintf(fid, ['ID,startBin#,endBin#,width(bins),totalSpikeCount,'... 
               'peakBin,peakHeight(spikes),Interval(bins)\n']);
 % ------------------------------------------------------------------------
@@ -37,9 +38,6 @@ b_boundary = find(diff(b_bins) > 1);            % find burst boundaries
 n_bursts = length(b_boundary)+1;                % total bursts
 b_boundary = [0; b_boundary];                   % boundary condition
 b_boundary = [b_boundary; length(b_bins)];      % boundary condition
-% ------------------------------------------------------------------------ 
-% Extract burst info and output burst metadata to csv file
-% ------------------------------------------------------------------------
 prev_peak = 0;
 for i = 1:n_bursts
     b.id = i;                                       % burst ID

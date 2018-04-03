@@ -26,12 +26,12 @@ n_burst = length(burstInfo);
 
 % output files
 prefile = ['csv/preBurst', int2str(window), ...
-            '-gap_', int2str(gapPre), '.csv'];
-fid_pre = fopen(prefile, 'w') ;
+            '_gap', int2str(gapPre)];
+fid_pre = fopen([prefile '.csv'], 'w') ;
 fprintf(fid_pre, 'ID,StartRow,EndRow,StartT,EndT,TotalSpikes\n');
 nonfile = ['csv/nonBurst', int2str(window), ...
-            '-gap_', int2str(gapNon), '.csv'];     
-fid_non = fopen(nonfile, 'w') ;
+            '_gap', int2str(gapNon)];     
+fid_non = fopen([nonfile '.csv'], 'w') ;
 fprintf(fid_non, 'ID,StartRow,EndRow,S tartT,EndT,TotalSpikes\n');     
 
 for i = 1:n_burst
@@ -66,8 +66,9 @@ for i = 1:n_burst
    fprintf(fid_non,'%d,%d,%d,%d,%d,%d\n',i,nonStart,nonEnd, ...
            stepCount(nonStart,1),stepCount(nonEnd,1), ... 
            sum(stepCount(nonStart:nonEnd,2)));  
-   fprintf('done with burst %d/%d\n', i, n_burst); 
+%    fprintf('done with burst %d/%d\n', i, n_burst); 
 end
+fprintf('window: %d, gapPre: %d, gapNon: %d\n',window,gapPre,gapNon); 
 fclose(fid_pre);
 fclose(fid_non);
 end

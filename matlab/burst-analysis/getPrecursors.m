@@ -9,7 +9,7 @@
 %   gapPre - number of spikes between burst and preburst
 %   gapNon - number of spikes between burst and nonburst
 %
-%   Return:
+%   Return:s
 %   prefile - preBurst precursor metadata filename
 %   nonfile - nonBurst precursor metadata filename
 %
@@ -17,7 +17,7 @@
 %   <csv/preBurst_WINDOW_gap_gapPre.csv> - preBurst metadata
 %   <csv/nonBurst_WINDOW_gap_gapNon.csv> - nonBurst metadata
 
-%Author: Jewel Y. Lee (jewel87@uw.edu) 4/1/2018 last updated.
+%Author: Jewel Y. Lee (jewel87@uw.edu) 4/5/2018 last updated.
 function [prefile, nonfile] = getPrecursors(window, gapPre, gapNon)
 % window = 100; gapPre = 10; gapNon = 1000;
 stepCount = csvread('csv/allSpikeTimeCount.csv');
@@ -32,7 +32,7 @@ fprintf(fid_pre, 'ID,StartRow,EndRow,StartT,EndT,TotalSpikes\n');
 nonfile = ['csv/nonBurst', int2str(window), ...
             '_gap', int2str(gapNon)];     
 fid_non = fopen([nonfile '.csv'], 'w') ;
-fprintf(fid_non, 'ID,StartRow,EndRow,S tartT,EndT,TotalSpikes\n');     
+fprintf(fid_non, 'ID,StartRow,EndRow,StartT,EndT,TotalSpikes\n');     
 
 for i = 1:n_burst
    spikes = 0;
@@ -50,19 +50,19 @@ for i = 1:n_burst
    preStart = row;           % mark preburst boundary
    fprintf(fid_pre,'%d,%d,%d,%d,%d,%d\n',i,preStart,preEnd, ...
            stepCount(preStart,1),stepCount(preEnd,1), ...
-           sum(stepCount(preStart:preEnd,2)));
+           sum(stepCount(preStart:preEnd,2))); 
    spikes = spikes + pre_spikes;
    while spikes < gapNon
        row = row - 1;
        spikes = spikes + stepCount(row,2);     
    end
    nonEnd = row - 1;         % mark nonburst boundary
-   while spikes < (window+gapNon)
+   non_spikes = 0;
+   while non_spikes < window
        row = row - 1;
-       spikes = spikes + stepCount(row,2);     
+       non_spikes = non_spikes + stepCount(row,2);     
    end
    nonStart = row;           % mark nonburst boundary
-
    fprintf(fid_non,'%d,%d,%d,%d,%d,%d\n',i,nonStart,nonEnd, ...
            stepCount(nonStart,1),stepCount(nonEnd,1), ... 
            sum(stepCount(nonStart:nonEnd,2)));  

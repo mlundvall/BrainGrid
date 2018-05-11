@@ -16,13 +16,17 @@
 %   m_speed - mean burst speed
 
 % Author:   Jewel Y. Lee (jewel87@uw.edu)
-% Last updated: 4/18/2018
-function [speed, m_speed] = getBurstSpeed(h5file, id, origin)
-burstfile = [h5file, '/Binned/burst_', num2str(id), '.csv'];
+% Last updated: 5/9/2018
+function [speed, m_speed] = getBurstSpeed(h5dir, id, origin)
+burstfile = [h5dir, '/Binned/burst_', num2str(id), '.csv'];
 frames = csvread(burstfile);  
 o_bin = 10;                 % origin bin
-s_bin = o_bin+5;            % avoid bins when burst just start
-e_bin = size(frames,2)-5;   % avoid bins when burst propogate to edges
+s_bin = o_bin+2;            % avoid bins when burst just start
+e_bin = size(frames,2)-2;   % avoid bins when burst propogate to edges
+while (e_bin - s_bin) < 1 && e_bin < size(frames,2)
+    e_bin = e_bin + 1;
+    s_bin = s_bin - 1;
+end
 unit = 10;                  % convert unit to distance/ms
 speed = zeros(e_bin-s_bin,1);
 

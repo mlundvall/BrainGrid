@@ -12,10 +12,10 @@
 % Author:   Jewel Y. Lee (jewel87@uw.edu)
 % Last updated: 4/16/2018
 function getSpikeTimes(h5file)
-if exist([h5file '/allSpikeTime.csv'],'file') == 2 || ...
-    exist([h5file '/allSpikeTimeCount.csv'],'file') == 2
-    error('spikeTime file already exsited.');
-end
+%if exist([h5file '/allSpikeTime.csv'],'file') == 2 || ...
+%    exist([h5file '/allSpikeTimeCount.csv'],'file') == 2
+%    error('spikeTime file already exsited.');
+%end
 % ------------------------------------------------------------------------ 
 % Read from input data and open output file
 % - spikesProbedNeurons = neurons and its firing times (column = neuron)
@@ -24,8 +24,8 @@ end
 P = (hdf5read([h5file '.h5'], 'spikesProbedNeurons'))';
 n_timesteps = getH5datasetSize(h5file, 'spikesHistory')*100;   
 % output file name
-fid = fopen([h5file '/allSpikeTime.csv'], 'w');           
-fid2 = fopen([h5file '/allSpikeTimeCount.csv'], 'w');          
+fid = fopen([h5file '/allSpikeTime1.csv'], 'w');           
+fid2 = fopen([h5file '/allSpikeTimeCount1.csv'], 'w');          
 % ------------------------------------------------------------------------ 
 % Get spiking position(s) for every time step that has activities
 % ------------------------------------------------------------------------
@@ -39,8 +39,8 @@ for i = 1:n_timesteps
     time = min(P(1, P(1,:) > 0));               % get next spike time 
     % condition: more than one neuron spikes at that time step 
     place = find(P(1,:) == time);               % get all spiking neurons
-    %fprintf(fid, '%d,', time);                  % record time step 
-    %fprintf(fid2,'%d,%d\n',time,length(place)); % record time and count 
+    fprintf(fid, '%d,', time);                  % record time step 
+    fprintf(fid2,'%d,%d\n',time,length(place)); % record time and count 
     fprintf('time step: %d; neuron#: ', time);% for debugging 
     % --------------------------------------------------------------------- 
     % Record firing neurons for each time step
@@ -51,7 +51,7 @@ for i = 1:n_timesteps
     % - when the 1st row are all zeros, means we have recorded everything
     % ---------------------------------------------------------------------
     for j = 1:length(place)   
-        %fprintf(fid, '%d,', place(j));          % record neuron number     
+        fprintf(fid, '%d,', place(j));          % record neuron number     
         fprintf('%d,', place(j));             % for debugging 
         counter = 2;                            % start from the 2nd row
         while P(counter, place(j)) < 1          % find next firing time

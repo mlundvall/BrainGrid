@@ -22,11 +22,11 @@
           
 """
 import os
+import sys
 import csv
 import numpy as np
 from SpikeData import Spike
 from SpikeData import Avalanche
-
 
 ###############################################################################
 # USER DEFINED VARIABLES
@@ -34,17 +34,8 @@ from SpikeData import Avalanche
 GRID = 100          # grid size (e.g. 100 is 100 x 100, 10000 neurons)
 TAU = 50.4202       # temporal window (unit: time steps (0.1ms))
 RADIUS = 8          # spatial window (unit: neuron distances)
-h5dir = 'tR_1.0--fE_0.90_10000'
-spikeTimeFile = 'allSpikeTime.csv'
-path = os.getcwd()
-# path = '/Users/jewellee/Documents/MATLAB/BrainGrid'
-
-infile = path + '/' + h5dir + '/' + spikeTimeFile
-outfile1 = path + '/' + h5dir + '/' + 'allAvalSizes2.csv'
-outfile2 = path + '/' + h5dir + '/' + 'allAvalList2.csv'
-# infile = path + '/' + h5dir + '/' + 'test.csv'
-
 ###############################################################################
+
 # -----------------------------------------------------------------------------
 # getXY()
 # get X, Y location using its neuron ID
@@ -114,11 +105,8 @@ def findAval(t, n, avals):
                     # record matched avalanches
                     match.append(i)
                     break
-                    # a.add_node(t, n)
-                    # return True
                 else:
                     node = node.prev
-            # end while
     return False
 
 # -----------------------------------------------------------------------------
@@ -131,24 +119,9 @@ def removeSingles():
             A.remove(a)
 
 # -----------------------------------------------------------------------------
-# displayAval()
-# traverse linked list and save data into a list
-# -----------------------------------------------------------------------------
-def displayAval(aval):
-    # list = []
-    node = aval.head
-    while node is not None:
-        # list.append(node.ts)
-        # list.append(getX(node.id))
-        # list.append(getY(node.id))
-        print(node.ts, node.id)
-        node = node.next
-    # return list
-
-# -----------------------------------------------------------------------------
 # outputAvalSize() write sizes of all avalanches to outfile
 # -----------------------------------------------------------------------------
-def outputAvalSize():
+def outputAvalSize(outfile1):
     f = open(outfile1, 'w')
     for a in A:
         #print(len(a))
@@ -158,7 +131,7 @@ def outputAvalSize():
 # -----------------------------------------------------------------------------
 # outputAvalList() write all avalanche lists to outfile
 # -----------------------------------------------------------------------------
-def outputAvalList():
+def outputAvalList(outfile2):
     f = open(outfile2, 'w')
     for a in A:
         # print(a.head.ts)
@@ -173,6 +146,11 @@ def outputAvalList():
 ###############################################################################
 # MAIN PROGRAM
 ###############################################################################
+infile = sys.argv[1]
+filename, file_extension = os.path.splitext(infile)
+outfile1 = filename + '_size.csv'
+outfile2 = filename + '_list.csv'
+
 # -----------------------------------------------------------------------------
 # Step 1: Create an empty list to hold avalanche objects
 # -----------------------------------------------------------------------------
@@ -185,9 +163,9 @@ for line in readCSV:
     current_ts = np.uint32(line[0])
     col = 1
     print(current_ts)   # debugging
-    # -----------------------------------------------------------------------------
-    # Step 3: Perform spatiotemporal clustering for each spike
-    # -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# Step 3: Perform spatiotemporal clustering for each spike
+# -----------------------------------------------------------------------------
     while col < (len(line)-1):
         current_id = np.uint16(line[col])
         # see if current spike can be added to existed avalanches
@@ -204,5 +182,5 @@ removeSingles()
 # -----------------------------------------------------------------------------
 # Step 5: Output results
 # -----------------------------------------------------------------------------
-outputAvalSize()
-outputAvalList()
+outputAvalSize(outfile1)
+# outputAvalList(outfile2)

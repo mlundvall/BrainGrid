@@ -1,58 +1,79 @@
-%% Jewel Y. Lee 2017 (Documented. Last updated: Dec 9, 2017)
-%  - read BrainGrid simulation result (.h5)
-%  - output spike time step and neuron index to <allSpikeTime.csv>
-function getAvalanches
-spiketime = csvread('allSpikeTimeCount.csv');
+%GETAVALANCHES 
+% 
+%   Syntax:  getAvalanches(h5dir)
+%   
+%   Input:
+%   infile - BrainGrid simulation result (.h5)
+%
+%   Output:
+%   <allAvalanche.csv> - spike time step and neuron indexes 
 
-frame = spiketime(:,1);         % frames/timeStep that has activities
-count = spiketime(:,2);         % spike counts for each frame
-space = diff(frame);            % find interspike intervals (ISI)
-totalCount = sum(count);
-% totalSpace = sum(space);
+% Author:   Jewel Y. Lee (jewel87@uw.edu)
+% Last updated: 5/09/2018
+function getAvalanches(h5dir)
+spiketime = csvread([h5dir '/allSpikeTimeCount.csv']);
+space = diff(spiketime(:,1));        % find interspike intervals (ISI)
+totalCount = sum(spiketime(:,2));    % total spike counts in the simulaiton
+% -----------------------------------------------------------------
+% Simulation parameters              % time step: 0.1ms = 0.0001s
+% -----------------------------------------------------------------
+n_bins = getH5datasetSize(h5dir,'spikesHistory');
+binSize = 100;                       % 10ms = 100 time steps
+totalTimeSteps = n_bins*binSize;     % total number of time steps
+meanISI = totalTimeSteps/totalCount; % mean interspike-interval (ts)
 
-numSim = 300;                   % number of simulation, 300 half, 600 full
-Tsim = 100;                     % 100 seconds long for each simulaiton 
-deltaT = 0.0001;                % time step size is 0.1 ms
-totalTimeSteps = numSim*Tsim*(1/deltaT);    % tatal number of time steps
-meanISI = totalTimeSteps/totalCount;        % mean interspike-interval
-
-fid = fopen('allAvalanche.csv', 'w') ;
-fprintf(fid, 'ID,StartRow,EndRow,StartT,EndT,Width,TotalSpikeCount,isBurst\n');
-n_aval = 0;                     % number of avalanches
-i = 1;                          % incrementer 
+fprintf('Total time steps: %d\n', totalTimeSteps);
+fprintf('Total spikes: %d\n', totalCount);
+fprintf('meanISI: %.4f\n', meanISI);
+% -----------------------------------------------------------------
+% Output files
+% -----------------------------------------------------------------
+fid_aval = fopen([h5dir '/allAvalanche.csv'], 'w') ;
+fprintf(fid_aval, 'ID,StartRow,EndRow,StartT,EndT,Width,TotalSpikes\n');
+fid_burst = fopen([h5dir '/allBurst.csv'], 'w') ;
+fprintf(fid_burst, 'ID,StartRow,EndRow,StartT,EndT,Width,TotalSpikes,IBI\n');
+n_avals = 0;                        % number of avalanches 
+n_bursts = 0;                       % number of bursts
+last = 1;                           % keep track of last spike
+i = 1;                              % incrementer 
 while i < length(space)
     % --------------------------------------------------------------------- 
-    % Identify avalanches and bursts
-    % - if the interval of two spikes < meanISI, it's an avalanche event
-    % - find where the avalanche ends and see if this avalanche is a burst
+    % Identify avalanches
+    % - if the interval of two spikes < meanISI or there are more than 2
+    %   spikes in one timestep, it's an avalanche event
     % ---------------------------------------------------------------------
-    if ((space(i) < meanISI) || (count(i) > 1))
-        n_aval = n_aval + 1;
-        j = i + 1;
-        while ((j < length(space)) && (space(j) < meanISI))
+    if ((space(i) < meanISI) || (spiketime(i,2) > 1))
+        n_avals = n_avals + 1;                        
+        % see how many continuous timesteps are in this avalanche
+        j = i + 1;                     
+        while ((space(j) < meanISI) && (j < length(space)))
             j = j + 1;
         end     
-        width = j - i + 1;                          % avalanche duration
-        totalSpikeCount = sum(count(i:j));          % total spike count      
+        width = spiketime(j,1)-spiketime(i,1)+1;    % duration (ts)
+        n_spikes = sum(spiketime(i:j, 2));          % avalanche size
+        fprintf(fid_aval,'%d,%d,%d,%d,%d,%d,%d\n', ...
+                n_avals,i,j,spiketime(i,1),spiketime(j,1), ...
+                width,n_spikes);
         % --------------------------------------------------------------------- 
-        % Identify bursts and find pre-burst & non-burst window
-        % - if the avalanche is a burst (spikeRate > burstThreshold)
-        % - output preburst window information to output file
+        % Identify bursts 
+        % - if the avalanche is a burst (spikeRate > burstThreshold),
+        %   output prebursta and nonburst window info to output file
         % ---------------------------------------------------------------------
-        if width > 500
-            isBurst = 1;                            % is a burst  
-        else
-            isBurst = 0;
-        end
-        fprintf(fid,'%d,%d,%d,%d,%d,%d,%d,%d\n', n_aval,i,j,spiketime(i),spiketime(j),width,totalSpikeCount,isBurst);
+        % width > 1e3? or n_spikes > 1e4 can be criteria to detect burst
+        if n_spikes > 1e4
+            n_bursts = n_bursts + 1;
+            interval = spiketime(i,1) - spiketime(last,1);           
+            fprintf(fid_burst,'%d,%d,%d,%d,%d,%d,%d,%d\n',...
+                    n_bursts,i,j,spiketime(i,1),spiketime(j,1),...
+                    width,n_spikes,interval);                
+            last = j;                   % save the time of last burst
+            fprintf('done with burst %d\n', n_bursts);    
+        end  
         i = j + 1;
     end
-    %fprintf('done with avalanche %d\n', i);    % for debugging 
-    i = i + 1;
+    i = i + 1;                          % increment i
 end
-fprintf('Total number of avalanches: %d\n', n_aval);
-fclose(fid);
-
-
-
-
+fprintf('Total number of avalanches: %d\n', n_avals);
+fprintf('Total number of bursts: %d\n', n_bursts);
+fclose(fid_aval);
+fclose(fid_burst);

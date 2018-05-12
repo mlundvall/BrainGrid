@@ -49,10 +49,10 @@ while i < length(space)
         while ((space(j) < meanISI) && (j < length(space)))
             j = j + 1;
         end     
-        width = spiketime(j,1)-spiketime(i,1)+1;    % duration (ts)
-        n_spikes = sum(spiketime(i:j, 2));          % avalanche size
+        width = spiketime(j,1)-spiketime(i-1,1)+1;  % duration (ts)
+        n_spikes = sum(spiketime(i-1:j, 2));          % avalanche size
         fprintf(fid_aval,'%d,%d,%d,%d,%d,%d,%d\n', ...
-                n_avals,i,j,spiketime(i,1),spiketime(j,1), ...
+                n_avals,i-1,j,spiketime(i-1,1),spiketime(j,1), ...
                 width,n_spikes);
         % --------------------------------------------------------------------- 
         % Identify bursts 
@@ -62,9 +62,9 @@ while i < length(space)
         % width > 1e3? or n_spikes > 1e4 can be criteria to detect burst
         if n_spikes > 1e4
             n_bursts = n_bursts + 1;
-            interval = spiketime(i,1) - spiketime(last,1);           
+            interval = spiketime(i-1,1) - spiketime(last,1);           
             fprintf(fid_burst,'%d,%d,%d,%d,%d,%d,%d,%d\n',...
-                    n_bursts,i,j,spiketime(i,1),spiketime(j,1),...
+                    n_bursts,i-1,j,spiketime(i-1,1),spiketime(j,1),...
                     width,n_spikes,interval);                
             last = j;                   % save the time of last burst
             fprintf('done with burst %d\n', n_bursts);    

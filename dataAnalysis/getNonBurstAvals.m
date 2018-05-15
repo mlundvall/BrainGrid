@@ -6,17 +6,18 @@ b_ecol = burstInfo(:,2);    % end column
 
 % break data into 10 chunks
 start = zeros(10,1);
-start(1) = find(burstInfo(:,3)>5*1e8, 1);  %7850
-ended = length(burstInfo);
+start(1) = find(burstInfo(:,3)>3.75*1e8, 1);  %7850
+ended = find(burstInfo(:,3)>5*1e8, 1);
+%ended = length(burstInfo);
 start = [start; ended];
-chunk = ceil((ended - start(1))/10);
+chunk = ceil((ended - start(1))/5);
 for i = 2:10
     start(i) = start(i-1) + chunk;
 end
-j = 4;
-while j < 10 %length(start)
+j = 1;
+while j <= 10 %length(start)
     % create a new output file
-    outfile = [h5dir '/nonBurstAvals_' num2str(j) '.csv'];
+    outfile = [h5dir '/nonBurstAvals_' num2str(j+10) '.csv'];
     command = ['touch ', outfile]; system(command);    
     count = start(j);
     disp(count);
@@ -31,12 +32,13 @@ while j < 10 %length(start)
     end   
     j = j + 1;
 end
-% while count < length(burstInfo) %9729
-count = start(j);
-disp(count);
-s = b_ecol(count) + 1;  % 127453826
-command = ['sed -n ''',num2str(s),',' ' $p'' ', ...
-           spikeTimeFile,' >> ', outfile];
-system(command);
+% disp(j)
+% % while count < length(burstInfo) %9729
+% count = start(j);
+% disp(count);
+% s = b_ecol(count) + 1;  % 127453826
+% command = ['sed -n ''',num2str(s),',' ' $p'' ', ...
+%            spikeTimeFile,' >> ', outfile];
+% system(command);
 end
 

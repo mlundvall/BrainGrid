@@ -32,8 +32,8 @@ from SpikeData import Avalanche
 # USER DEFINED VARIABLES
 ###############################################################################
 GRID = 100          # grid size (e.g. 100 is 100 x 100, 10000 neurons)
-TAU = 50.4202       # temporal window (unit: time steps (0.1ms))
-RADIUS = 8          # spatial window (unit: neuron distances)
+TAU = 1.5      	    # temporal window (unit: time steps (0.1ms))
+RADIUS = 1.5        # spatial window (unit: neuron distances)
 ###############################################################################
 
 # -----------------------------------------------------------------------------

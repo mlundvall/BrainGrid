@@ -17,14 +17,16 @@
 %   <csv/preBurst_WINDOW_gap_gapPre.csv> - preBurst metadata
 %   <csv/nonBurst_WINDOW_gap_gapNon.csv> - nonBurst metadata
 
-%Author: Jewel Y. Lee (jewel87@uw.edu) 4/5/2018 last updated.
-function [prefile, nonfile] = getPrecursors(window, gapPre, gapNon)
+% Author: Jewel Y. Lee (jewel87@uw.edu)
+% Last updated: 5/09/2018
+function [prefile, nonfile] = getPrecursors(h5dir, window, gapPre, gapNon)
 % window = 100; gapPre = 10; gapNon = 1000;
-stepCount = csvread('csv/allSpikeTimeCount.csv');
-burstInfo = csvread('csv/allBurst.csv',1,1);
-n_burst = length(burstInfo);
-
-% output files
+stepCount = csvread([h5dir '/allSpikeTimeCount.csv']);
+burstInfo = csvread([h5dir '/allBurst.csv'],1,1);
+n_bursts = length(burstInfo);
+% -----------------------------------------------------------------
+% Output files
+% -----------------------------------------------------------------
 prefile = ['csv/preBurst', int2str(window), ...
             '_gap', int2str(gapPre)];
 fid_pre = fopen([prefile '.csv'], 'w') ;
@@ -34,20 +36,20 @@ nonfile = ['csv/nonBurst', int2str(window), ...
 fid_non = fopen([nonfile '.csv'], 'w') ;
 fprintf(fid_non, 'ID,StartRow,EndRow,StartT,EndT,TotalSpikes\n');     
 
-for i = 1:n_burst
+for i = 1:n_bursts
    spikes = 0;
    row = burstInfo(i,1);
    while spikes < gapPre
        row = row - 1;
        spikes = spikes + stepCount(row,2);       
    end
-   preEnd = row - 1;         % mark preburst boundary
+   preEnd = row - 1;         % mark preburst boundary end
    pre_spikes = 0;
    while pre_spikes < window
        row = row - 1;
        pre_spikes = pre_spikes + stepCount(row,2);
    end
-   preStart = row;           % mark preburst boundary
+   preStart = row;           % mark preburst boundary start
    fprintf(fid_pre,'%d,%d,%d,%d,%d,%d\n',i,preStart,preEnd, ...
            stepCount(preStart,1),stepCount(preEnd,1), ...
            sum(stepCount(preStart:preEnd,2))); 
@@ -56,17 +58,17 @@ for i = 1:n_burst
        row = row - 1;
        spikes = spikes + stepCount(row,2);     
    end
-   nonEnd = row - 1;         % mark nonburst boundary
+   nonEnd = row - 1;         % mark nonburst boundary end
    non_spikes = 0;
    while non_spikes < window
        row = row - 1;
        non_spikes = non_spikes + stepCount(row,2);     
    end
-   nonStart = row;           % mark nonburst boundary
+   nonStart = row;           % mark nonburst boundary start
    fprintf(fid_non,'%d,%d,%d,%d,%d,%d\n',i,nonStart,nonEnd, ...
            stepCount(nonStart,1),stepCount(nonEnd,1), ... 
            sum(stepCount(nonStart:nonEnd,2)));  
-%    fprintf('done with burst %d/%d\n', i, n_burst); 
+%    fprintf('done with burst %d/%d\n', i, n_bursts); 
 end
 fprintf('window: %d, gapPre: %d, gapNon: %d\n',window,gapPre,gapNon); 
 fclose(fid_pre);

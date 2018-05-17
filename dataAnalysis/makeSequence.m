@@ -13,9 +13,9 @@
 %   sequence  - array of size 1 x (3*n_spikes)
 
 %Author: Jewel Y. Lee (jewel87@uw.edu) 4/1/2018 last updated.
-function sequence = makeSequence(h5file, spikeTime, window)
-xloc = uint16((hdf5read([h5file '.h5'], 'xloc'))'); xloc=xloc+1;    % x location
-yloc = uint16((hdf5read([h5file '.h5'], 'yloc'))'); yloc=yloc+1;    % y location
+function sequence = makeSequence(h5dir, spikeTime, window)
+xloc = uint16((hdf5read([h5dir '.h5'], 'xloc'))'); xloc=xloc+1;
+yloc = uint16((hdf5read([h5dir '.h5'], 'yloc'))'); yloc=yloc+1;
 t_offset = spikeTime(1,1);          % relative time offset
 features = 3*window;                % 3 features (t,x,y) for each spike
 seq = zeros(3,window);
@@ -23,7 +23,7 @@ for row = size(spikeTime,1):-1:1    % for each timestep in this event
     t = spikeTime(row,1) - t_offset;     
     col = 2;                        % neuron idx starts at 2nd column
     % for all spikes in this timestep
-    while spikeTime(row,col) > 0 && window > 0  
+    while col <= size(spikeTime,2) && spikeTime(row,col) > 0 && window > 0
         seq(1,window) = t;
         seq(2,window) = xloc(spikeTime(row,col));
         seq(3,window) = yloc(spikeTime(row,col));

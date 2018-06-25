@@ -11,9 +11,9 @@
 
 % Author:   Jewel Y. Lee (jewel87@uw.edu)
 % Last updated: 5/09/2018
-function getSpikeTimes(h5file)
-if exist([h5file '/allSpikeTime.csv'],'file') == 2 || ...
-    exist([h5file '/allSpikeTimeCount.csv'],'file') == 2
+function getSpikeTimes(h5dir)
+if exist([h5dir '/allSpikeTime.csv'],'file') == 2 || ...
+    exist([h5dir '/allSpikeTimeCount.csv'],'file') == 2
     error('spikeTime file already exsited.');
 end
 % ------------------------------------------------------------------------ 
@@ -22,8 +22,8 @@ end
 % - spikesHistory = spike count in each 10ms bins
 % ------------------------------------------------------------------------
 dataset = 'spikesProbedNeurons';
-P = hdf5read([h5file '.h5'], dataset);
-n_timesteps = getH5datasetSize(h5file, 'spikesHistory')*100;            
+P = hdf5read([h5dir '.h5'], dataset);
+n_timesteps = getH5datasetSize(h5dir, 'spikesHistory')*100;            
 n_neurons = size(P,1);                      % total number of neurons
 maxCol = size(P,2);                         % maximum firing times/cols
 P = [P zeros(n_neurons,1)];                 % for boundary condition

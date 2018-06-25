@@ -29,6 +29,7 @@ class Spike(object):
         y = np.floor_divide((self.id - 1), GRID) + 1
         return y
 
+
 # -----------------------------------------------------------------------------
 # CLASS: Avalanche()
 # each Avalanche is a doubly linked list
@@ -122,6 +123,30 @@ class Avalanche(object):
 
         # increment size
         self.size = self.size + 1
+        return
+
+    # -----------------------------------------------------------------------------
+    #
+    # -----------------------------------------------------------------------------
+    def remove(self, curr_node):
+        if curr_node is self.head:
+            next_node = self.head.next
+            self.head = next_node
+            next_node.prev = None
+
+        elif curr_node is self.tail:
+            prev_node = self.tail.prev
+            self.tail = prev_node
+            prev_node.next = None
+        else:
+            prev_node = curr_node.prev
+            next_node = curr_node.next
+            prev_node.next = next_node
+            next_node.prev = prev_node
+        # endif
+        # decrement size
+        self.size = self.size - 1
+        del curr_node
         return
 
     # -----------------------------------------------------------------------------
